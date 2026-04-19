@@ -4,7 +4,6 @@ local mt = getrawmetatable(game)
 local orig_namecall = rawget(mt, "__namecall")
 local orig_debug = clonefunction(debug.info)
 
--- Cobre tanto level 2 quanto 3, e também quando chamado via [C]
 hookfunction(debug.info, newcclosure(function(level, options)
     if options == "s" then
         local s = orig_debug(level, options)
