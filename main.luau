@@ -1,28 +1,28 @@
-local sync = game:GetService("ReplicatedStorage").Packages.Synchronizer
 local sort_re = game:GetService("ReplicatedStorage").Packages.Net["RE/InventoryService/Sort"]
-local mt = getrawmetatable(game)
-local orig_namecall = rawget(mt, "__namecall")
-local orig_debug = clonefunction(debug.info)
-
-hookfunction(debug.info, newcclosure(function(level, options)
-    if options == "s" then
-        local s = orig_debug(level, options)
-        if s == "[C]" or (s and not s:find(".", 1, true)) then
-            return "LocalScript"
-        end
-        return s
-    end
-    return orig_debug(level, options)
-end))
-
-setreadonly(mt, false)
-rawset(mt, "__namecall", newcclosure(function(self, ...)
-    if getnamecallmethod() == "FireServer" and self == sort_re then return end
-    return orig_namecall(self, ...)
-end))
-setreadonly(mt, true)
+local sync = game:GetService("ReplicatedStorage").Packages.Synchronizer
 
 unlockmodulescript(sync)
+
+for i = 1, 100 do
+    local name, val = debug.getupvalue(require, i)
+    if not name then break end
+end
+
+local func_list = {}
+for _, v in debug.getprotos and debug.getprotos(sync) or {} do
+    table.insert(func_list, v)
+end
+
+for _, proto in func_list do
+    for i = 1, 100 do
+        local ok, name = pcall(debug.getupvaluename or function() end, proto, i)
+        if not ok or not name then break end
+        if name == "v_u_8" then
+            debug.setupvalue(proto, i, true)
+        end
+    end
+end
+
 local module = require(sync)
 task.wait(3)
 
